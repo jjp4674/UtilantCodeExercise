@@ -1,0 +1,23 @@
+﻿@model UtilantCodeExercise.Models.Album
+
+<div class="modal-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Album Details: @Model.title</h2>
+        </div>
+    </div>
+</div>
+<div class="modal-body">
+    @for (int i = 0; i < Model.photos.Count; i += 6)
+    {
+        <div class="row" style="padding-bottom: 20px;">
+            @for (int j = 0; j < 6 && (i + j) < Model.photos.Count; j++)
+            {
+                <div class="col-xs-12 col-md-2 text-center">
+                    <img src="@Model.photos[i+j].thumbnailUrl" alt="@Model.photos[i+j].title" /><br />
+                    <h6>@Model.photos[i + j].title</h6>
+                </div>
+            }
+        </div>
+    }
+</div>

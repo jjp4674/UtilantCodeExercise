@@ -1,0 +1,38 @@
+﻿@model UtilantCodeExercise.Models.User
+
+<div class="modal-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>User Details: @Model.username</h2>
+        </div>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-xs-12 col-md-3">
+            <p>
+                @Model.name<br />
+            @Model.address.street<br />
+            @Model.address.suite<br />
+            @Model.address.city, @Model.address.zipcode<br />
+            @Model.address.geo.lat, @Model.address.geo.lng
+        </p>
+        <p>@Model.phone</p>
+        <p>@Model.website</p>
+        <p>
+            @Model.company.name<br />
+        @Model.company.catchPhrase<br />
+        @Model.company.bs
+    </p>
+</div>
+<div class="col-xs-12 col-md-9">
+    @foreach (UtilantCodeExercise.Models.Post p in Model.posts)
+    {
+        <div class="post">
+            <h4><b>@p.title</b></h4>
+            @p.body
+        </div>
+    }
+</div>
+</div>
+</div>

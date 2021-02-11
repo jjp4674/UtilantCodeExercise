@@ -1,0 +1,173 @@
+﻿@model PagedList.IPagedList<UtilantCodeExercise.Models.Album>
+
+@{
+    ViewBag.Title = "Albums Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using PagedList.Mvc;
+
+<div class="row">
+    <div class="col-md-8 col-xs-12"><h2>Albums</h2></div>
+    <div class="col-md-4 col-xs-12 right headerRight text-right">
+        <div id="searchBox"><span data-toggle="modal" data-target="#filterModal">Search</span><img src="~/Images/search.png" data-toggle="modal" data-target="#filterModal" /></div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+    <div id="filterModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2>Filter Albums</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="padding-bottom: 10px; display: flex;">
+                        <div class="col-xs-3" style="margin: auto;">
+                            Title:
+                        </div>
+                        <div class="col-xs-9">
+                            @Html.TextBox("TitleFilter", ViewBag.TitleFilter as string, new { style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="row" style="display: flex;">
+                        <div class="col-xs-3" style="margin: auto;">
+                            User's Name:
+                        </div>
+                        <div class="col-xs-9">
+                            @Html.TextBox("UserNameFilter", ViewBag.UserNameFilter as string, new { style = "width: 100%" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-xs-6 text-left">
+                            <input id="submitBtn" type="submit" name="submit" class="btn btn-sm btn-success" value="Filter Albums" />
+                        </div>
+                        <div class="col-xs-6">
+                            <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@for (int i = 0; i < Model.Count; i += 4)
+{
+    <div class="row">
+        @for (int j = 0; j < 4 && (i + j) < Model.Count; j++)
+        {
+            <div class="col-xs-6 col-md-3 text-center" style="padding-bottom: 40px;">
+                <img src="@Model[i+j].photos.FirstOrDefault().thumbnailUrl" alt="@Model[i+j].photos.FirstOrDefault().title" /><br />
+                <h4 class="albumTitle" id="@Model[i + j].id" data-toggle="modal" data-target="#albumModal" style="cursor: pointer;">@Model[i + j].title</h4>
+                <span class="userTitle" id="@Model[i + j].userId" data-toggle="modal" data-target="#userModal" style="cursor: pointer;">@Model[i + j].user.name</span><br />
+                @Model[i + j].user.email<br />
+                @Model[i + j].user.phone<br />
+                @Model[i + j].user.address.street, @Model[i + j].user.address.suite<br />
+                @Model[i + j].user.address.city, @Model[i + j].user.address.zipcode
+            </div>
+        }
+    </div>
+}
+
+<div class="row">
+    <div class="col-xs-12 col-md-3" style="margin: auto;">
+        Showing @Model.FirstItemOnPage to @Model.LastItemOnPage of @Model.TotalItemCount Albums
+    </div>
+    <div class="col-xs-12 col-md-6 text-center">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            ViewBag.TitleFilter,
+            ViewBag.UserNameFilter
+        }), new PagedListRenderOptions
+        {
+            LinkToFirstPageFormat = "First",
+            LinkToPreviousPageFormat = "Previous",
+            LinkToNextPageFormat = "Next",
+            LinkToLastPageFormat = "Last",
+            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+            DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+            MaximumPageNumbersToDisplay = 10
+        })
+    </div>
+    <div class="col-xs-12 col-md-3">
+
+    </div>
+</div>
+
+<div id="albumModal" class="modal fade" role="dialog">
+    <div class="modal-dialog-wide">
+        <div class="modal-content">
+            <div id="AlbumDetails">
+
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="userModal" class="modal fade" role="dialog">
+    <div class="modal-dialog-wide">
+        <div class="modal-content">
+            <div id="UserDetails">
+
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(document).on('click', '.albumTitle', function () {
+            var id = $(this).attr("id");
+
+            $.ajax({
+                async: true,
+                url: '/Albums/GetAlbumDetails?id=' + id,
+                success: function (partialView) {
+                    $("#AlbumDetails").empty();
+
+                    $("#AlbumDetails").append(partialView);
+                }
+            });
+        });
+
+        $(document).on('click', '.userTitle', function () {
+            var id = $(this).attr("id");
+
+            $.ajax({
+                async: true,
+                url: '/Albums/GetUserDetails?userId=' + id,
+                success: function (partialView) {
+                    $("#UserDetails").empty();
+
+                    $("#UserDetails").append(partialView);
+                }
+            });
+        });
+    });
+</script>
