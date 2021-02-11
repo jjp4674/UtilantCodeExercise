@@ -43,6 +43,11 @@ namespace UtilantCodeExercise.Controllers
                 }
             }
 
+            if (albums.Count() < (pageIndex * 12))
+            {
+                pageIndex = 1;
+            }
+
             IPagedList<Album> pagedData = albums.ToPagedList(pageIndex, pageSize);
 
             foreach (Album a in pagedData)
